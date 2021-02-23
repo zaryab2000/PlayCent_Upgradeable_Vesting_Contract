@@ -64,6 +64,13 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		vestCategory[9] = vestingDetails(7,60 days,120 days,20000000000000000000,5100000 ether); // Private Sale 2
 	}
 
+
+	modifier onlyValidVestingBenifciary(address _userAddresses,uint8 _vestingIndex) { 
+		require(_vestingIndex >= 0 && _vestingIndex <= 9,"Invalid Vesting Index");		  
+		require (_userAddresses != address(0),"Invalid Address");
+		require (!userToVestingDetails[_userAddresses].isVesting,"User Vesting Details Already Added");
+		_; 
+	}
 	/**
 	 * @notice - Allows only the Owner to ADD an array of Addresses as well as their Vesting Amount
 	 		   - The array of user and amounts should be passed along with the vestingCategory Index. 
@@ -74,13 +81,6 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 * @return - returns TRUE if Function executes successfully
 	 */
 
-	modifier onlyValidVestingBenifciary(address _userAddresses,uint8 _vestingIndex) { 
-		require(_vestingIndex >= 0 && _vestingIndex <= 9,"Invalid Vesting Index");		  
-		require (_userAddresses != address(0),"Invalid Address");
-		require (!userToVestingDetails[_userAddresses].isVesting,"User Vesting Details Already Added");
-		_; 
-	}
-	
 	function addVestingDetails(address[] memory _userAddresses, uint256[] memory _vestingAmounts, uint8 _vestnigType) external onlyOwner returns(bool){
 		require(_vestnigType >= 0 && _vestnigType <= 9,"Invalid Vesting Index");
 		require(_userAddresses.length == _vestingAmounts.length,"Unequal arrays passed");
@@ -105,7 +105,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 
 	/** @notice - Internal functions that is initializes the vestAccountDetails Struct with the respective arguments passed
 	 * @param _userAddresses addresses of the User
-	 * @param _totalAmounts total amount to be lockedUp
+	 * @param _totalAmount total amount to be lockedUp
 	 * @param _categoryId denotes the type of vesting selected
 	 * @param _vestingCliff denotes the cliff of the vesting category selcted
 	 * @param _vestingDuration denotes the total duration of the vesting category selcted
@@ -131,7 +131,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 
 	/**
 	 * @notice Returns the Variable Rate of Vest depending on the no. of months passed
-	 * @param address of the User  
+	 * @param user address of the User  
 	 */
 	function _getSaleVestRate(address user) internal view returns(uint256){
 		vestAccountDetails memory vestingData = userToVestingDetails[user];
