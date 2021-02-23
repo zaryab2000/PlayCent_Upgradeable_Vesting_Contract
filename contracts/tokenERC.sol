@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 
 
-contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
+contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	using SafeMathUpgradeable for uint;
 	/**
 	 * Category 0 - Team
@@ -36,13 +36,14 @@ contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradea
 		uint startTime;
 		uint vestingDuration;
 		uint vestingCliff;
+		uint vestingPercent;
 		uint totalMonthsClaimed;
 		uint totalAmountClaimed;
 		bool isVesting;
 	}
 
 	mapping (uint => vestingDetails) public vestCategory;
-	mapping(address => vestAccountDetails) public vestingDetails;
+	mapping(address => vestAccountDetails) public userToVestingDetails;
 	
 	function initialize() initializer public{
 		__Ownable_init();
@@ -72,28 +73,37 @@ contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradea
 	 * @param _vestnigType allows the owner to select the type of vesting category
 	 * @return - returns TRUE if Function executes successfully
 	 */
+
+	modifier onlyValidVestingBenifciary(address _userAddresses,uint8 _vestingIndex) { 
+		require(_vestingIndex >= 0 && _vestingIndex <= 9,"Invalid Vesting Index");		  
+		require (_userAddresses != address(0),"Invalid Address");
+		require (!userToVestingDetails[_userAddresses].isVesting,"User Vesting Details Already Added");
+		_; 
+	}
+	
 	function addVestingDetails(address[] memory _userAddresses, uint256[] memory _vestingAmounts, uint8 _vestnigType) external onlyOwner returns(bool){
-		require(_vestnigTypes >= 0 && _vestnigTypes <= 7,"Invalid Vesting Index");
+		require(_vestnigType >= 0 && _vestnigType <= 9,"Invalid Vesting Index");
 		require(_userAddresses.length == _vestingAmounts.length,"Unequal arrays passed");
 
-		vestingDetails memory vestData = vestCategory[_vestnigTypes];
+		vestingDetails memory vestData = vestCategory[_vestnigType];
 		uint arrayLength = _userAddresses.length;
 
-		for(uint i= 0; i<address.length; i++){
+		for(uint i= 0; i<arrayLength; i++){
 			uint8 categoryId = _vestnigType;
 			address user = _userAddresses[i];
 			uint256 amount = _vestingAmounts[i];
 			uint256 vestingDuration = vestData.lockUpPeriod;
 			uint256 vestingCliff = vestData.cliff;
-			uint256 vestPercent = vestingData.vestPercentage
+			uint256 vestPercent = vestData.vestPercentage
 
 
 			addUserVestingDetails(user,categoryId,amount,vestingCliff,vestingDuration,vestPercent);
 		}
 		return true
 	}
-   /**
-	 * @notice - Internal functions that is initializes the vestAccountDetails Struct with the respective arguments passed
+
+
+	/** @notice - Internal functions that is initializes the vestAccountDetails Struct with the respective arguments passed
 	 * @param _userAddresses addresses of the User
 	 * @param _totalAmounts total amount to be lockedUp
 	 * @param _categoryId denotes the type of vesting selected
@@ -102,11 +112,8 @@ contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradea
 	 * @param _vestPercent denotes the percentage of total amount to be vested after cliff period
 	 * @return - returns TRUE if Function executes successfully
 	 */
-	function addUserVestingDetails(address _userAddresses, uint8 _categoryId, uint256 _totalAmount, uint256 _vestingCliff, uint256 _vestingDuration,uint256 _vestPercent) internal{
-		require (_userAddresses != address(0),"Invalid Address");
-		require (_totalAmount>0,"Total Amount can not be ZERO");
-		require (!vestingDetails[_userAddresses].isVesting,"User Vesting Details Already Added");
-		
+	 
+	function addUserVestingDetails(address _userAddresses, uint8 _categoryId, uint256 _totalAmount, uint256 _vestingCliff, uint256 _vestingDuration,uint256 _vestPercent) onlyValidVestingBenifciary(_userAddresses,_categoryId) internal{	
 		vestAccountDetails memory userVestingData = vestAccountDetails(
 			_categoryId,
 			_userAddresses,
@@ -114,12 +121,12 @@ contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradea
 			block.timestamp,
 			_vestingDuration,
 			_vestingCliff,
+			_vestPercent,
 			0,
 			0,
 			true	
 		);
-		vestingDetails[_userAddresses] = vestingData;
-
+		userToVestingDetails[_userAddresses] = userVestingData;
 	}
 
 	/**
@@ -127,7 +134,7 @@ contract PlaycentToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradea
 	 * @param address of the User  
 	 */
 	function _getSaleVestRate(address user) internal view returns(uint256){
-		vestAccountDetails memory vestingData = vestingDetails[user];
+		vestAccountDetails memory vestingData = userToVestingDetails[user];
 		uint8 category = vestingData.categoryId;
 		//Check whether the category id is of any particular Sale(Seed,Private 1 or Private 2)
 		require(category >= 5 && category <= 7,"Invalid Sale Vest Index");
