@@ -74,6 +74,11 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		_; 
 	}
 
+	modifier checkValidVestingCategory(uint8 _index){ 
+		require(_index >= 0 && _index <= 9,"Invalid Vesting Index");
+		_; 
+	}
+
 	modifier checkVestingStatus(address _userAddresses){ 
 	 	require (userToVestingDetails[_userAddresses].isVesting,"User NOT added to any Vesting Category");
 		_; 
@@ -83,11 +88,11 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		return block.timestamp;
 	}	
 
-	function monthInSeconds() internal view returns(uint256){		
+	function monthInSeconds() internal pure returns(uint256){		
 		return 2592000;
 	}
 	
-	function daysInSeconds() internal view returns(uint256){		
+	function daysInSeconds() internal pure returns(uint256){		
 		return 86400;
 	}
 	/**
@@ -101,7 +106,6 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 */
 
 	function addVestingDetails(address[] calldata _userAddresses, uint256[] calldata _vestingAmounts, uint8 _vestnigType) external onlyOwner returns(bool){
-		require(_vestnigType >= 0 && _vestnigType <= 9,"Invalid Vesting Index");
 		require(_userAddresses.length == _vestingAmounts.length,"Unequal arrays passed");
 
 		vestingDetails memory vestData = vestCategory[_vestnigType];
@@ -194,7 +198,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		if(vestData.categoryId <= 6){
 	 		vestRate = vestData.vestingPercent;
 	 	}else{
-	 		vestRate = _getSaleVestRate();
+	 		vestRate = _getSaleVestRate(_userAddresses);
 	 	}
 
 	 	return vestRate;
@@ -202,7 +206,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	
    /**
 	 * @notice Calculates the amount of tokens to be transferred at any given point of time
-	 * @param user address of the User  
+	 * @param _userAddresses address of the User  
 	 */
 
 	 function calculateClaimableTokens(address _userAddresses) public checkVestingStatus(_userAddresses) returns(uint256){	 	
@@ -220,18 +224,19 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 	uint256 timeElapsed = currentTime.sub(vestStartTime);
 	 	uint256 oneMonthInSeconds = monthInSeconds();
 
-		vestRate = getVestingRate();
+		vestRate = getVestingRate(_userAddresses);
 	 	// Finally check the Claimable Amount by comparing the timeElapsed with the Current Time
 
 	 	if(currentTime < vestCliff){  // If Vesting Cliff is not reached yet
 	 		return 0;
 	 	}else if(currentTime > vestDuration){ // If total duration of Vesting already crossed
-	 		uint256 amountPerMonth = (vestData.totalAmount.mul(vestRate)).div(100000000000000000000);
-	 		uint256 totalDuration = vestData.vestingDuration.div(oneMonthInSeconds);
-	 		totalClaimableAmount = (amountPerMonth.mul(totalDuration)).sub(vestData.totalAmountClaimed);
+	 		// uint256 amountPerMonth = (vestData.totalAmount.mul(vestRate)).div(100000000000000000000);
+	 		// uint256 totalDuration = vestData.vestingDuration.div(oneMonthInSeconds);
+	 		totalClaimableAmount = vestData.totalAmount.sub(vestData.totalAmountClaimed);
 	 	}else{ // if current time has crossed the Vesting Cliff but not the total Vesting Duration
 	 		uint256 amountPerMonth = (vestData.totalAmount.mul(vestRate)).div(100000000000000000000);
 	 		uint256 totalMonthsElapsed = timeElapsed.div(oneMonthInSeconds);
+	 		require (totalMonthsElapsed > 0,"Number of months elapsed is ZERO");
 	 		totalClaimableAmount = (amountPerMonth.mul(totalMonthsElapsed)).sub(vestData.totalAmountClaimed);
 	 	}
 
