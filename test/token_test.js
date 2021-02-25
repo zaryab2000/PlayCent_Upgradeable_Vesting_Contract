@@ -77,8 +77,8 @@ contract("TokenSale Contract", accounts => {
     assert.equal(userVestingData_1[1],accounts[1],"Wallet Address Is wrongly assigned");
     assert.equal(userVestingData_1[2].toString(),user1_amount.toString(),"Total Amount is wrongly assigned");
     assert.equal(userVestingData_1[6].toString(),"5000000000000000000","Vesting Rate Is wrongly assigned");
-    assert.equal(userVestingData_1[7].toString(),"0","Total Allocated Amount Is wrongly assigned");
-    assert.equal(userVestingData_1[8].toString(),"0","Vesting Category Is wrongly assigned");
+    assert.equal(userVestingData_1[7].toString(),user2_amount.toString(),"Total Remaining Amount Is wrongly assigned");
+    assert.equal(userVestingData_1[8].toString(),"0","Total Amount claimed Is wrongly assigned");
     assert.equal(userVestingData_1[9],true,"IsVesting Is wrongly assigned");
 
     // User 2 checks
@@ -86,8 +86,8 @@ contract("TokenSale Contract", accounts => {
     assert.equal(userVestingData_2[1],accounts[2],"Wallet Address Is wrongly assigned for User 2");
     assert.equal(userVestingData_2[2].toString(),user2_amount.toString(),"Total Amount is wrongly assigned for User 2");
     assert.equal(userVestingData_2[6].toString(),"5000000000000000000","Vesting Rate Is wrongly assigned  for User 2");
-    assert.equal(userVestingData_2[7].toString(),"0","Total Allocated Amount Is wrongly assigned for User 2");
-    assert.equal(userVestingData_2[8].toString(),"0","Vesting Category Is wrongly assigned for User 2");
+    assert.equal(userVestingData_2[7].toString(),user2_amount.toString(),"Remaining Amount Is wrongly assigned for User 2");
+    assert.equal(userVestingData_2[8].toString(),"0","Total Amount claimed wrongly assigned for User 2");
     assert.equal(userVestingData_2[9],true,"IsVesting Is wrongly assigned for User 2");
 
   })

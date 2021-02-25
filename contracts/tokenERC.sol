@@ -39,7 +39,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		uint vestingDuration;
 		uint vestingCliff;
 		uint vestingPercent;
-		uint totalMonthsClaimed;
+		uint remainingAmountToTransfer;
 		uint totalAmountClaimed;
 		bool isVesting;
 	}
@@ -59,11 +59,11 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		vestCategory[3] = vestingDetails(3,30 days, 334 days,10000000000000000000,2400000 ether); // Advisors
 		vestCategory[4] = vestingDetails(4,213 days, 334 days,10000000000000000000,4800000 ether); //Staking/Early Incentive Rewards
 		vestCategory[5] = vestingDetails(5,91 days, 852 days,4000000000000000000,9000000 ether); //Play Mining	
-		vestCategory[6] = vestingDetails(5,182 days, 912 days,1000000000000000000,4200000 ether); //Reserve	
+		vestCategory[6] = vestingDetails(6,182 days, 912 days,1000000000000000000,4200000 ether); //Reserve	
 		// Sale Vesting Strategies
-		vestCategory[7] = vestingDetails(5,60 days,213 days,10000000000000000000,5700000 ether); // Seed Sale
-		vestCategory[8] = vestingDetails(6,60 days,150 days,15000000000000000000,5400000 ether); // Private Sale 1
-		vestCategory[9] = vestingDetails(7,60 days,120 days,20000000000000000000,5100000 ether); // Private Sale 2
+		vestCategory[7] = vestingDetails(7,60 days,213 days,10000000000000000000,5700000 ether); // Seed Sale
+		vestCategory[8] = vestingDetails(8,60 days,150 days,15000000000000000000,5400000 ether); // Private Sale 1
+		vestCategory[9] = vestingDetails(9,60 days,120 days,20000000000000000000,5100000 ether); // Private Sale 2
 	}
 
 
@@ -144,7 +144,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 			_vestingDuration,
 			_vestingCliff,
 			_vestPercent,
-			0,
+			_totalAmount,
 			0,
 			true	
 		);
@@ -246,6 +246,26 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		super.transfer(_beneficiary,_amountOfTokens);
 		return true;
 	}
+
+	function claimVestTokens(address _userAddresses) external checkVestingStatus(_userAddresses) returns(bool){
+		// Get Vesting Details
+	 	vestAccountDetails memory vestData = userToVestingDetails[_userAddresses];
+
+		uint256 tokensToTransfer = calculateClaimableTokens(_userAddresses);
+		uint256 contractTokenBalance = balanceOf(address(this));
+		require(contractTokenBalance > tokensToTransfer,"Not Enough Token Balance in Contract"));
+		require(vestData.totalAmountClaimed.add(tokensToTransfer) <= vestData.totalAmount,"Cannot Claim more than Allocated");
+		
+
+		vestData.totalAmountClaimed = tokensToTransfer;
+		vestData.remainingAmountToTransfer = vestData.remainingAmountToTransfer.sub(tokensToTransfer);
+		if(vestData.remainingAmountToTransfer == 0){
+			vestData.isVesting = false;
+		}
+		userToVestingDetails[_userAddresses] = vestData;
+		sendTokens(_userAddresses,tokensToTransfer);
+	}
+	
 	
 	
 }
