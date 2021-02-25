@@ -155,6 +155,28 @@ contract("TokenSale Contract", accounts => {
       assert.equal(vestRate_3.toString(),expectedRate.toString(),"Rates didn't match for User 3")
   })
 
+  // Calculate Claimable Tokens before increasing time
+  it("Calculate Claimable Tokens function should work as expected before increasing time ", async()=>{
+      const expectedClaimableTokens_user1 = 0;
+      const expectedClaimableTokens_user6 = 0;
+
+      const actualClaimableReturn_user1 = await tokenInstance.calculateClaimableTokens(accounts[1]);
+      const actualClaimableReturn_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+
+      assert.equal(actualClaimableReturn_user1.toString(),expectedClaimableTokens_user1.toString(),"Calcualted Rate is wrong for user 1");
+      assert.equal(actualClaimableReturn_user6.toString(),expectedClaimableTokens_user6.toString(),"Calcualted Rate is wrong for user 6");
+ })
+
+  // Claculating Rate before CLIFF 
+
+   it("Calculate Claimable Tokens function should work as expected before 60 days cliff ", async()=>{
+      const expectedClaimableTokens_user4 = 0;
+
+      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+      
+      assert.equal(actualClaimableReturn_user4.toString(),expectedClaimableTokens_user4.toString(),"Calcualted Rate is wrong for user 4");
+
+ })
   /**
    * Time Checks Boundaries
    * Below 60 Days
@@ -164,11 +186,11 @@ contract("TokenSale Contract", accounts => {
    * Between 150 to 213 days
    */
   it("Time should increase by Days", async() =>{
-    await time.increase(time.duration.days(61));
+    await time.increase(time.duration.days(60));
   })
 
   // Time 61 Days Later
- it("Sale Vesting Rates should be calculated as expected", async()=>{
+ it("Sale Vesting Rates should be calculated as expected Between 60 to 90 days", async()=>{
       const expectedRate4 = ether('15');
       const expectedRate5 = ether('20');
       const expectedRate6 = ether('20');
@@ -183,11 +205,20 @@ contract("TokenSale Contract", accounts => {
 
   })
 
+    it("Calculate Claimable Tokens function should work as expected before 60 days cliff ", async()=>{
+      const expectedClaimableTokens_user4 = ether('300');
+
+      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+      console.log(actualClaimableReturn_user4.toString())
+     // assert.equal(actualClaimableReturn_user4.toString(),expectedClaimableTokens_user4.toString(),"Calcualted Rate is wrong for user 4");
+
+ })
+
    it("Time should increase by Days", async() =>{
     await time.increase(time.duration.days(32));
   })
    // Time 93 Days Later
- it("Sale Vesting Rates should be calculated as expected", async()=>{
+ it("Sale Vesting Rates should be calculated as expected Between 90 to 120 days", async()=>{
       const expectedRate4 = ether('15');
       const expectedRate5 = ether('20');
       const expectedRate6 = ether('30');
@@ -203,11 +234,12 @@ contract("TokenSale Contract", accounts => {
   })
 
 
+
    it("Time should increase by Days", async() =>{
     await time.increase(time.duration.days(32));
   })
    // Time 125 Days Later
- it("Sale Vesting Rates should be calculated as expected", async()=>{
+ it("Sale Vesting Rates should be calculated as expected Between 120 to 150 days", async()=>{
       const expectedRate4 = ether('15');
       const expectedRate5 = ether('25');
       const expectedRate6 = 0;
@@ -227,7 +259,7 @@ contract("TokenSale Contract", accounts => {
     await time.increase(time.duration.days(32));
   })
    // Time 157Days Later
- it("Sale Vesting Rates should be calculated as expected", async()=>{
+ it("Sale Vesting Rates should be calculated as expected Between 150 to 213 days", async()=>{
       const expectedRate4 = ether('15');
       const expectedRate5 = 0;
       const expectedRate6 = 0;
@@ -242,7 +274,7 @@ contract("TokenSale Contract", accounts => {
 
   })
 
-    it("Time should increase by Days", async() =>{
+  it("Time should increase by Days", async() =>{
     await time.increase(time.duration.days(100));
   })
     // Time 257 days Later
@@ -260,11 +292,20 @@ contract("TokenSale Contract", accounts => {
       assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
 
   })
-  //Check Sale Vesting RATE withRespect to time
-   it("Sale Vesting Rates should be calculated as expected", async()=>{
-    
-  })
 
+ it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(120));
+  })
+    // Time 377 days later
+
+ //  it("Calculate Claimable Tokens function should work as expected after cliff ", async()=>{
+ //      const expectedClaimableTokens_user1 = ether('100');
+
+ //      const actualClaimableReturn_user1 = await tokenInstance.calculateClaimableTokens(accounts[1]);
+
+ //      assert.equal(actualClaimableReturn_user1.toString(),expectedClaimableTokens_user1.toString(),"Calcualted Rate is wrong for user 1");
+
+ // })
   // Check Claimable token for a particular user at any given time
    it("Claimable token should be calculated correctly at any given time", async()=>{
     

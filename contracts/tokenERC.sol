@@ -209,7 +209,28 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 * @param _userAddresses address of the User  
 	 */
 
-	 function calculateClaimableTokens(address _userAddresses) public checkVestingStatus(_userAddresses) returns(uint256){	 	
+
+	 function timeElapsed(address _userAddresses) public view checkVestingStatus(_userAddresses) returns(uint256){	 	
+	 	// Get Vesting Details
+	 	vestAccountDetails memory vestData = userToVestingDetails[_userAddresses];
+	 	
+	 	uint256 vestRate;
+	 	uint256 totalClaimableAmount;
+	 	uint256 vestStartTime = vestData.startTime;
+	 	uint256 currentTime = getCurrentTime();
+	 	uint256 vestCliff = vestStartTime.add(vestData.vestingCliff);
+	 	uint256 vestDuration = vestStartTime.add(vestData.vestingDuration);
+	 	
+	 	
+	 	uint256 timeElapsed = currentTime.sub(vestStartTime);
+	 	uint256 oneMonthInSeconds = monthInSeconds();
+		uint256 totalMonthsElapsed = timeElapsed.div(oneMonthInSeconds);
+		uint actualMonthElapsed = totalMonthsElapsed.sub(vestData.vestingCliff.div(oneMonthInSeconds));
+	 	
+	 	return actualMonthElapsed;
+
+	 }
+	 function calculateClaimableTokens(address _userAddresses) public view checkVestingStatus(_userAddresses) returns(uint256){	 	
 	 	// Get Vesting Details
 	 	vestAccountDetails memory vestData = userToVestingDetails[_userAddresses];
 	 	
@@ -236,9 +257,12 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 	}else{ // if current time has crossed the Vesting Cliff but not the total Vesting Duration
 	 		uint256 amountPerMonth = (vestData.totalAmount.mul(vestRate)).div(100000000000000000000);
 	 		uint256 totalMonthsElapsed = timeElapsed.div(oneMonthInSeconds);
-	 		require (totalMonthsElapsed > 0,"Number of months elapsed is ZERO");
-	 		totalClaimableAmount = (amountPerMonth.mul(totalMonthsElapsed)).sub(vestData.totalAmountClaimed);
+	 		// Calculating Actual Months(Excluding the CLIFF) to initiate vesting
+	 		uint actualMonthElapsed = totalMonthsElapsed.sub(vestData.vestingCliff.div(oneMonthInSeconds)); 
+	 		require (actualMonthElapsed > 0,"Number of months elapsed is ZERO");
+	 		totalClaimableAmount = (amountPerMonth.mul(actualMonthElapsed)).sub(vestData.totalAmountClaimed);
 	 	}
+	 	return totalClaimableAmount;
 
 	 }
 	 
