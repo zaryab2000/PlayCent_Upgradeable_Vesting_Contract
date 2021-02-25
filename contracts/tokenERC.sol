@@ -242,7 +242,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 
 	 }
 	 
-	function sendTokens(address _beneficiary, uint256 _amountOfTokens) external returns(bool){
+	function _sendTokens(address _beneficiary, uint256 _amountOfTokens) internal returns(bool){
 		super.transfer(_beneficiary,_amountOfTokens);
 		return true;
 	}
@@ -253,7 +253,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 
 		uint256 tokensToTransfer = calculateClaimableTokens(_userAddresses);
 		uint256 contractTokenBalance = balanceOf(address(this));
-		require(contractTokenBalance > tokensToTransfer,"Not Enough Token Balance in Contract"));
+		require(contractTokenBalance > tokensToTransfer,"Not Enough Token Balance in Contract");
 		require(vestData.totalAmountClaimed.add(tokensToTransfer) <= vestData.totalAmount,"Cannot Claim more than Allocated");
 		
 
@@ -263,7 +263,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 			vestData.isVesting = false;
 		}
 		userToVestingDetails[_userAddresses] = vestData;
-		sendTokens(_userAddresses,tokensToTransfer);
+		_sendTokens(_userAddresses,tokensToTransfer);
 	}
 	
 	

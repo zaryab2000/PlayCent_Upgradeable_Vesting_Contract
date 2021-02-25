@@ -59,7 +59,7 @@ contract("TokenSale Contract", accounts => {
 
 
   // Adding User details w.r.t vesting Categories by Owner
-  it("Owner should be able to add User1 to the Vesting Schedule", async()=>{
+  it("Owner should be able to add User1,2 and 3 to the Vesting Schedule", async()=>{
     const user1_amount = ether('2000');
     const user2_amount = ether('4000');
     const user3_amount = ether('6000');
@@ -77,7 +77,7 @@ contract("TokenSale Contract", accounts => {
     assert.equal(userVestingData_1[1],accounts[1],"Wallet Address Is wrongly assigned");
     assert.equal(userVestingData_1[2].toString(),user1_amount.toString(),"Total Amount is wrongly assigned");
     assert.equal(userVestingData_1[6].toString(),"5000000000000000000","Vesting Rate Is wrongly assigned");
-    assert.equal(userVestingData_1[7].toString(),user2_amount.toString(),"Total Remaining Amount Is wrongly assigned");
+    assert.equal(userVestingData_1[7].toString(),user1_amount.toString(),"Total Remaining Amount Is wrongly assigned");
     assert.equal(userVestingData_1[8].toString(),"0","Total Amount claimed Is wrongly assigned");
     assert.equal(userVestingData_1[9],true,"IsVesting Is wrongly assigned");
 
@@ -91,6 +91,40 @@ contract("TokenSale Contract", accounts => {
     assert.equal(userVestingData_2[9],true,"IsVesting Is wrongly assigned for User 2");
 
   })
+
+  it("Owner should be able to add User4,5,6 to the Sale Vesting Schedule", async()=>{
+    const user4_amount = ether('2000');
+    const user5_amount = ether('4000');
+    const user6_amount = ether('6000');
+
+    await tokenInstance.addVestingDetails([accounts[4]],[user4_amount],7);
+    await tokenInstance.addVestingDetails([accounts[5]],[user5_amount],8);
+    await tokenInstance.addVestingDetails([accounts[6]],[user6_amount],9);
+
+    const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4])
+    const userVestingData_5 = await tokenInstance.userToVestingDetails(accounts[5])
+    const userVestingData_6 = await tokenInstance.userToVestingDetails(accounts[6])
+  
+    // User 1 checks
+    assert.equal(userVestingData_4[0].toString(),"7","Vesting Category Is wrongly assigned");
+    assert.equal(userVestingData_4[1],accounts[4],"Wallet Address Is wrongly assigned");
+    assert.equal(userVestingData_4[2].toString(),user4_amount.toString(),"Total Amount is wrongly assigned");
+    assert.equal(userVestingData_4[6].toString(),"10000000000000000000","Vesting Rate Is wrongly assigned");
+    assert.equal(userVestingData_4[7].toString(),user4_amount.toString(),"Total Remaining Amount Is wrongly assigned");
+    assert.equal(userVestingData_4[8].toString(),"0","Total Amount claimed Is wrongly assigned");
+    assert.equal(userVestingData_4[9],true,"IsVesting Is wrongly assigned");
+
+    // User 2 checks
+    assert.equal(userVestingData_5[0].toString(),"8","Vesting Category Is wrongly assigned for User 2");
+    assert.equal(userVestingData_5[1],accounts[5],"Wallet Address Is wrongly assigned for User 2");
+    assert.equal(userVestingData_5[2].toString(),user5_amount.toString(),"Total Amount is wrongly assigned for User 2");
+    assert.equal(userVestingData_5[6].toString(),"15000000000000000000","Vesting Rate Is wrongly assigned  for User 2");
+    assert.equal(userVestingData_5[7].toString(),user5_amount.toString(),"Remaining Amount Is wrongly assigned for User 2");
+    assert.equal(userVestingData_5[8].toString(),"0","Total Amount claimed wrongly assigned for User 2");
+    assert.equal(userVestingData_5[9],true,"IsVesting Is wrongly assigned for User 2");
+
+  })
+
 
 
   // Adding User details w.r.t vesting Categories by only Owner
@@ -107,11 +141,125 @@ contract("TokenSale Contract", accounts => {
     
   // })
 
+
   //Check Normal Vesting RATE withRespect to time
-  it("Vesting Rates should be calculated as expected", async()=>{
+  it("Normal Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate = ether('5');
+      
+      const vestRate_1 = await tokenInstance.getVestingRate(accounts[1]);
+      const vestRate_2 = await tokenInstance.getVestingRate(accounts[2]);
+      const vestRate_3 = await tokenInstance.getVestingRate(accounts[3]);
     
+      assert.equal(vestRate_1.toString(),expectedRate.toString(),"Rates didn't match for User 1")
+      assert.equal(vestRate_2.toString(),expectedRate.toString(),"Rates didn't match for User 2")
+      assert.equal(vestRate_3.toString(),expectedRate.toString(),"Rates didn't match for User 3")
   })
 
+  /**
+   * Time Checks Boundaries
+   * Below 60 Days
+   * Between 60 to 90 days
+   * Between 90 to 120
+   * Between 120 to 150 days
+   * Between 150 to 213 days
+   */
+  it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(61));
+  })
+
+  // Time 61 Days Later
+ it("Sale Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate4 = ether('15');
+      const expectedRate5 = ether('20');
+      const expectedRate6 = ether('20');
+     
+      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
+      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
+      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+
+      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
+      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
+      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
+
+  })
+
+   it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(32));
+  })
+   // Time 93 Days Later
+ it("Sale Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate4 = ether('15');
+      const expectedRate5 = ether('20');
+      const expectedRate6 = ether('30');
+     
+      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
+      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
+      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+
+      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
+      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
+      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
+
+  })
+
+
+   it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(32));
+  })
+   // Time 125 Days Later
+ it("Sale Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate4 = ether('15');
+      const expectedRate5 = ether('25');
+      const expectedRate6 = 0;
+     
+      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
+      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
+      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+
+      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
+      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
+      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
+
+  })
+
+
+   it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(32));
+  })
+   // Time 157Days Later
+ it("Sale Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate4 = ether('15');
+      const expectedRate5 = 0;
+      const expectedRate6 = 0;
+     
+      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
+      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
+      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+
+      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
+      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
+      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
+
+  })
+
+    it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(100));
+  })
+    // Time 257 days Later
+ it("Sale Vesting Rates should be calculated as expected", async()=>{
+      const expectedRate4 = 0;
+      const expectedRate5 = 0;
+      const expectedRate6 = 0;
+     
+      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
+      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
+      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+
+      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
+      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
+      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
+
+  })
   //Check Sale Vesting RATE withRespect to time
    it("Sale Vesting Rates should be calculated as expected", async()=>{
     
