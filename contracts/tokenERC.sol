@@ -252,7 +252,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 }
 	 
 	function _sendTokens(address _beneficiary, uint256 _amountOfTokens) internal returns(bool){
-		super.transfer(_beneficiary,_amountOfTokens);
+		_transfer(address(this),_beneficiary,_amountOfTokens);
 		return true;
 	}
 
@@ -261,6 +261,8 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		require (currentTime>getTgeTIME(), "Token Generation Event Not Started Yet");
 		// Get Vesting Details
 	 	vestAccountDetails memory vestData = userToVestingDetails[_userAddresses];
+
+	 	require (vestData.categoryId >= 6 && vestData.categoryId <= 9, "Vesting Category doesn't belong to SALE VEsting" );
 	 	require (vestData.tgeTokensClaimed == false, "TGE Tokens Have already been claimed for Given Address");
 	 	
 	 	uint256 totalAmount = vestData.totalAmount;

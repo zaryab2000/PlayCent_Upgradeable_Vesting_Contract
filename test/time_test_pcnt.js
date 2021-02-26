@@ -194,7 +194,7 @@ it("Time should increase by Days", async() =>{
   		const expectedClaims_user3 = 0;
   		const expectedClaims_user4 = ether('900')
   		const expectedClaims_user5 = ether('4000')
-  		const expectedClaims_user6 = ether('6000');
+  		const expectedClaims_user6 = ether('4800');
 
   		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
   		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
