@@ -133,26 +133,129 @@ contract("TokenSale Contract", accounts => {
    * Between 150 to 213 days
    */
 
+   // 90 DAYS LATER (Considering the fact that the CLIFF itself is 60 days)
+   // 90 Days means => 90 - 60 DAYS(Of Cliff) = 1 month. Thus interests calculated for the 1 month(only) after CLIFF LockUp Peiod
   it("Time should increase by Days", async() =>{
     await time.increase(time.duration.days(90));
   })
  
- it("Calculate Claimable Tokens after 60 days Cliff", async() =>{
+ it("Calculate Claimable Tokens after 90 days Cliff", async() =>{
+  		const expectedClaims_user3 = 0;
   		const expectedClaims_user4 = ether('300')
   		const expectedClaims_user5 = ether('800')
   		const expectedClaims_user6 = ether('1200')
 
+  		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
   		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
   		const actualClaim_user5 = await tokenInstance.calculateClaimableTokens(accounts[5]);
   		const actualClaim_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
 
-  		
+  		assert.equal(expectedClaims_user3.toString(), actualClaim_user3.toString(),"Expected Claims didn't match correctly for User 4")  		
   		assert.equal(expectedClaims_user4.toString(), actualClaim_user4.toString(),"Expected Claims didn't match correctly for User 4")
   		assert.equal(expectedClaims_user5.toString(), actualClaim_user5.toString(),"Expected Claims didn't match correctly for User 5")
   		assert.equal(expectedClaims_user6.toString(), actualClaim_user6.toString(),"Expected Claims didn't match correctlyfor User 6")
 
   })
 
+ // 120 DAYS LATER
+
+it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(30));
+  })
+ 
+ it("Calculate Claimable Tokens after 120 days Cliff", async() =>{
+  		const expectedClaims_user3 = 0;
+  		const expectedClaims_user4 = ether('600')
+  		const expectedClaims_user5 = ether('1600')
+  		const expectedClaims_user6 = ether('6000')
+
+  		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
+  		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+  		const actualClaim_user5 = await tokenInstance.calculateClaimableTokens(accounts[5]);
+  		const actualClaim_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+
+  		console.log(actualClaim_user4.toString())
+  		console.log(expectedClaims_user4.toString())
+  		assert.equal(actualClaim_user3.toString(), expectedClaims_user3.toString(),"Expected Claims didn't match correctly for User 3")  		
+  		assert.equal(actualClaim_user4.toString(), expectedClaims_user4.toString(),"Expected Claims didn't match correctly for User 4")
+  		assert.equal(actualClaim_user5.toString(), expectedClaims_user5.toString(),"Expected Claims didn't match correctly for User 5")
+  		assert.equal(actualClaim_user6.toString(), expectedClaims_user6.toString(),"Expected Claims didn't match correctlyfor User 6")
+
+  })
+
+
+//   // 150 DAYS LATER
+
+it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(30));
+  })
+ 
+ it("Calculate Claimable Tokens after 150 days Cliff", async() =>{
+  		const expectedClaims_user3 = 0;
+  		const expectedClaims_user4 = ether('900')
+  		const expectedClaims_user5 = ether('4000')
+  		const expectedClaims_user6 = ether('6000');
+
+  		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
+  		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+  		const actualClaim_user5 = await tokenInstance.calculateClaimableTokens(accounts[5]);
+  		const actualClaim_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+
+  		assert.equal(actualClaim_user3.toString(), expectedClaims_user3.toString(),"Expected Claims didn't match correctly for User 3")  		
+  		assert.equal(actualClaim_user4.toString(), expectedClaims_user4.toString(),"Expected Claims didn't match correctly for User 4")
+  		assert.equal(actualClaim_user5.toString(), expectedClaims_user5.toString(),"Expected Claims didn't match correctly for User 5")
+  		assert.equal(actualClaim_user6.toString(), expectedClaims_user6.toString(),"Expected Claims didn't match correctlyfor User 6")
+
+
+  })
+
+   // 211 DAYS LATER
+
+it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(63));
+  })
+ 
+ it("Calculate Claimable Tokens after 211 days Cliff", async() =>{
+  		const expectedClaims_user3 = 0;
+  		const expectedClaims_user4 = ether('2000')
+  		const expectedClaims_user5 = ether('4000');
+  		const expectedClaims_user6 = ether('6000');
+
+  		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
+  		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+  		const actualClaim_user5 = await tokenInstance.calculateClaimableTokens(accounts[5]);
+  		const actualClaim_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+	
+	    assert.equal(actualClaim_user3.toString(), expectedClaims_user3.toString(),"Expected Claims didn't match correctly for User 3")  		
+  		assert.equal(actualClaim_user4.toString(), expectedClaims_user4.toString(),"Expected Claims didn't match correctly for User 4")
+  		assert.equal(actualClaim_user5.toString(), expectedClaims_user5.toString(),"Expected Claims didn't match correctly for User 5")
+  		assert.equal(actualClaim_user6.toString(), expectedClaims_user6.toString(),"Expected Claims didn't match correctlyfor User 6")
+
+  })
+    // 395 DAYS LATER
+
+it("Time should increase by Days", async() =>{
+    await time.increase(time.duration.days(185));
+  })
+ 
+ it("Calculate Claimable Tokens after 395 days Cliff", async() =>{
+  		const expectedClaims_user3 = ether('300');
+  		const expectedClaims_user4 = ether('2000');
+  		const expectedClaims_user5 = ether('4000');
+  		const expectedClaims_user6 = ether('6000');
+
+  		const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3]);
+  		const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+  		const actualClaim_user5 = await tokenInstance.calculateClaimableTokens(accounts[5]);
+  		const actualClaim_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+
+  		assert.equal(actualClaim_user3.toString(), expectedClaims_user3.toString(),"Expected Claims didn't match correctly for User 3")  		
+  		assert.equal(actualClaim_user4.toString(), expectedClaims_user4.toString(),"Expected Claims didn't match correctly for User 4")
+  		assert.equal(actualClaim_user5.toString(), expectedClaims_user5.toString(),"Expected Claims didn't match correctly for User 5")
+  		assert.equal(actualClaim_user6.toString(), expectedClaims_user6.toString(),"Expected Claims didn't match correctlyfor User 6")
+
+
+  })
   it("Time should increase by Days", async() =>{
     await time.increase(time.duration.days(974));
   })

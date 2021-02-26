@@ -43461,7 +43461,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-02-25T14:15:56.180Z",
+  "updatedAt": "2021-02-26T08:17:02.505Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {
