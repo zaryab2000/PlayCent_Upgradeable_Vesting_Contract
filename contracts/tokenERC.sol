@@ -61,7 +61,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		vestCategory[5] = vestingDetails(5,91 days, 852 days,4000000000000000000,9000000 ether); //Play Mining	
 		vestCategory[6] = vestingDetails(6,182 days, 912 days,1000000000000000000,4200000 ether); //Reserve	
 		// Sale Vesting Strategies
-		vestCategory[7] = vestingDetails(7,60 days,213 days,10000000000000000000,5700000 ether); // Seed Sale
+		vestCategory[7] = vestingDetails(7,60 days,210 days,10000000000000000000,5700000 ether); // Seed Sale
 		vestCategory[8] = vestingDetails(8,60 days,150 days,15000000000000000000,5400000 ether); // Private Sale 1
 		vestCategory[9] = vestingDetails(9,60 days,120 days,20000000000000000000,5100000 ether); // Private Sale 2
 	}
@@ -160,7 +160,7 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 * @notice Calculates the Variable Rate of Vest depending on the amount of time(months) elapsed
 	 * @param user address of the User  
 	 */
-	function _getSaleVestRate(address user,uint8 _vestingIndex) internal view returns(uint256){
+	function _getSaleVestTokens(address user,uint8 _vestingIndex) internal view returns(uint256){
 		vestAccountDetails memory vestingData = userToVestingDetails[user][_vestingIndex];
 		uint8 category = vestingData.categoryId;
 		//Check whether the category id is of any particular Sale(Seed,Private 1 or Private 2)
@@ -172,38 +172,59 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		uint256 oneDayInSeconds = daysInSeconds();
 
 		uint256 timeElapsedInDays = timeElapsed.div(oneDayInSeconds);
-		uint256 currentVestRate;
+		uint256 tokensToTransfer;
 
-		if(category == 7){
-            if(timeElapsedInDays > 60 && timeElapsedInDays <= 213 ){
-            	currentVestRate = 15 ether;
-            }
-		}
+		uint256 tgeTokens = vestingData.totalAmount.mul(vestingData.vestingPercent).div(100 ether);
+
 		if(category == 8){
-            if(timeElapsedInDays > 60 && timeElapsedInDays <= 120 ){
-            	currentVestRate = 20 ether;
+            if(timeElapsedInDays > 90 && timeElapsedInDays <= 120 ){
+            	tokensToTransfer = vestingData.totalAmount.mul(20 ether).div(100 ether);
+            }else if(timeElapsedInDays > 120 && timeElapsedInDays <= 150){
+            	uint256 previousTokens = vestingData.totalAmount.mul(40 ether).div(100 ether);
+            	uint256 currentTokens  = vestingData.totalAmount.mul(25 ether).div(100 ether);
+            	tokensToTransfer = currentTokens.add(previousTokens);
+            }else if(timeElapsedInDays > 150 && timeElapsedInDays <= 180){
+            	uint256 previousTokens = vestingData.totalAmount.mul(60 ether).div(100 ether);
+            	uint256 currentTokens  = vestingData.totalAmount.mul(25 ether).div(100 ether);
+            	tokensToTransfer = currentTokens.add(previousTokens);
+            }
+		}else if(category == 9){
+            if(timeElapsedInDays > 90 && timeElapsedInDays <= 120 ){
+            	tokensToTransfer = vestingData.totalAmount.mul(20 ether).div(100 ether);
+
             }else if(timeElapsedInDays > 120 && timeElapsedInDays <= 150 ){
-            	currentVestRate = 25 ether;
+            	uint256 previousTokens = vestingData.totalAmount.mul(20 ether).div(100 ether);
+            	uint256 currentTokens = vestingData.totalAmount.mul(30 ether).div(100 ether);
+            	tokensToTransfer = currentTokens.add(previousTokens);
+
+            }else if(timeElapsedInDays > 150 && timeElapsedInDays <= 180){
+            	uint256 previousTokens = vestingData.totalAmount.mul(20 ether).div(100 ether);
+            	uint256 currentTokens = vestingData.totalAmount.mul(60 ether).div(100 ether);
+            	tokensToTransfer = currentTokens.add(previousTokens);
             }
 		}
-		if(category == 9){
-            if(timeElapsedInDays > 60 && timeElapsedInDays <= 90 ){
-            	currentVestRate = 20 ether;
-            }else if(timeElapsedInDays > 90 && timeElapsedInDays <= 120 ){
-            	currentVestRate = 30 ether;
-            }
+		tokensToTransfer = tokensToTransfer.sub(vestingData.totalAmountClaimed);
+		if(vestingData.tgeTokensClaimed){
+			tokensToTransfer = tokensToTransfer.sub(tgeTokens);
 		}
-		return currentVestRate;
+		return tokensToTransfer;
 	}
 
 	function getVestingRate(address _userAddresses,uint8 _vestingIndex) public checkVestingStatus(_userAddresses,_vestingIndex) view returns(uint256){
 		uint256 vestRate;
 		vestAccountDetails memory vestData = userToVestingDetails[_userAddresses][_vestingIndex];
 
+		uint256 currentTime = getCurrentTime();
+		uint256 userStartTime = vestData.startTime;
+		uint256 timeElapsed = currentTime.sub(userStartTime);
+		uint256 oneDayInSeconds = daysInSeconds();
+
+		uint256 timeElapsedInDays = timeElapsed.div(oneDayInSeconds);
+
 		if(vestData.categoryId <= 6){
 	 		vestRate = vestData.vestingPercent;
-	 	}else{
-	 		vestRate = _getSaleVestRate(_userAddresses,_vestingIndex);
+	 	}else if(vestData.categoryId == 7 && timeElapsedInDays > 90){
+	 		vestRate = 15 ether;
 	 	}
 
 	 	return vestRate;
@@ -228,10 +249,11 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 	uint256 timeElapsed = currentTime.sub(vestStartTime);
 	 	uint256 oneMonthInSeconds = monthInSeconds();
 
-		vestRate = getVestingRate(_userAddresses,_vestingIndex);
-	 	// Finally check the Claimable Amount by comparing the timeElapsed with the Current Time
+		if(vestData.categoryId <= 7){
+			 vestRate = getVestingRate(_userAddresses,_vestingIndex);
 
-	 	if(currentTime < vestCliff){  // If Vesting Cliff is not reached yet
+			// Finally check the Claimable Amount by comparing the timeElapsed with the Current Time
+			 if(currentTime < vestCliff){  // If Vesting Cliff is not reached yet
 	 		return 0;
 	 	}else if(currentTime > vestDuration){ // If total duration of Vesting already crossed
 	 		totalClaimableAmount = vestData.totalAmount.sub(vestData.totalAmountClaimed);
@@ -246,6 +268,12 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 	 		require (actualMonthElapsed > 0,"Number of months elapsed is ZERO");
 	 		totalClaimableAmount = (amountPerMonth.mul(actualMonthElapsed)).sub(vestData.totalAmountClaimed);
 	 	}
+
+		}else{
+			 uint256 tokensToTransfer = _getSaleVestTokens(_userAddresses,_vestingIndex);
+			 totalClaimableAmount = tokensToTransfer;
+		}
+	 	
 	 	return totalClaimableAmount;
 
 	 }
@@ -304,11 +332,11 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		
 		// Get total token amount to be transferred
 		uint256 tokensToTransfer = calculateClaimableTokens(_userAddresses,_vestingIndex);
+		require (tokensToTransfer > 0,"No tokens to transfer");
 		uint256 contractTokenBalance = balanceOf(address(this));
 		require(contractTokenBalance > tokensToTransfer,"Not Enough Token Balance in Contract");
 		require(vestData.totalAmountClaimed.add(tokensToTransfer) <= vestData.totalAmount,"Cannot Claim more than Allocated");
 		
-
 		vestData.totalAmountClaimed += tokensToTransfer;
 		if(vestData.totalAmountClaimed == vestData.totalAmount){
 			vestData.isVesting = false;
@@ -316,7 +344,4 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
 		userToVestingDetails[_userAddresses][_vestingIndex] = vestData;
 		_sendTokens(_userAddresses,tokensToTransfer);
 	}
-	
-	
-	
 }
