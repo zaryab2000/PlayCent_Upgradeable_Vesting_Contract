@@ -118,57 +118,57 @@ it("Time should increase by 30 Days", async() =>{
       assert.equal(userVestingData_5[9],false,"tgeTokensClaimed Boolean is true");
 })
 
- it("User 6 should be able to claim After 151 days Period", async()=>{
-      const user6_amount = ether('2000');
-      const expectedClaims_user6 = ether('400');
-      const totalClaims_user6 = ether('2000');
-      const currentBalance_user6 = ether('1600');
+//  it("User 6 should be able to claim After 151 days Period", async()=>{
+//       const user6_amount = ether('2000');
+//       const expectedClaims_user6 = ether('400');
+//       const totalClaims_user6 = ether('2000');
+//       const currentBalance_user6 = ether('1600');
 
-      const balanceBefore_user6 = await tokenInstance.balanceOf(accounts[6]);
-      const actualClaim_user6_before = await tokenInstance.calculateClaimableTokens(accounts[6],9);
-      // Claim Claiming Function
-      await tokenInstance.claimVestTokens(accounts[6],9,{from:accounts[6]});
-      const userVestingData_6 = await tokenInstance.userToVestingDetails(accounts[6],9)
+//       const balanceBefore_user6 = await tokenInstance.balanceOf(accounts[6]);
+//       const actualClaim_user6_before = await tokenInstance.calculateClaimableTokens(accounts[6],9);
+//       // Claim Claiming Function
+//       await tokenInstance.claimVestTokens(accounts[6],9,{from:accounts[6]});
+//       const userVestingData_6 = await tokenInstance.userToVestingDetails(accounts[6],9)
       
-      const balanceAfter_user6 = await tokenInstance.balanceOf(accounts[6]);
+//       const balanceAfter_user6 = await tokenInstance.balanceOf(accounts[6]);
 
-      console.log(balanceBefore_user6.toString())
-      console.log(balanceAfter_user6.toString())
-      console.log(actualClaim_user6_before.toString())
-      console.log(userVestingData_6[7].toString())
+//       console.log(balanceBefore_user6.toString())
+//       console.log(balanceAfter_user6.toString())
+//       console.log(actualClaim_user6_before.toString())
+//       console.log(userVestingData_6[7].toString())
       
-      // assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred")
-      // assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred")
-      // assert.equal(actualClaim_user5_before.toString(),expectedClaims_user5.toString(),"Expected claims is not equal to actual")
-      // assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
-      // assert.equal(userVestingData_5[8],false,"isVesting Boolean is false before than expected")
-      // assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
-})
+//       // assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred")
+//       // assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred")
+//       // assert.equal(actualClaim_user5_before.toString(),expectedClaims_user5.toString(),"Expected claims is not equal to actual")
+//       // assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
+//       // assert.equal(userVestingData_5[8],false,"isVesting Boolean is false before than expected")
+//       // assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
+// })
 
 it("Time should increase by 30 Days", async() =>{
     await time.increase(time.duration.days(30));
   })
 
 
-// it('User 5 should be able to Claim TGE tokens after TGE Time', async ()=>{
-//         const user5_amount = ether('2000');
-//       const totalClaims_user5 = ether('1600');
-//       const currentBalance_user5 = ether('1300');
+it('User 5 should be able to Claim TGE tokens after TGE Time', async ()=>{
+        const user5_amount = ether('2000');
+      const totalClaims_user5 = ether('1600');
+      const currentBalance_user5 = ether('1300');
 
-//       const balanceBefore_user5 = await tokenInstance.balanceOf(accounts[5]);
+      const balanceBefore_user5 = await tokenInstance.balanceOf(accounts[5]);
 
-//       // Claim Claiming Function
-//       await tokenInstance.claimTGETokens(accounts[5],8,{from:accounts[5]});
-//       const userVestingData_5 = await tokenInstance.userToVestingDetails(accounts[5],8)
+      // Claim Claiming Function
+      await tokenInstance.claimTGETokens(accounts[5],8,{from:accounts[5]});
+      const userVestingData_5 = await tokenInstance.userToVestingDetails(accounts[5],8)
       
-//       const balanceAfter_user5 = await tokenInstance.balanceOf(accounts[5]);
-//        assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred before")
-//       assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred after")
-//       assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
-//       assert.equal(userVestingData_5[8],true,"isVesting Boolean is false before than expected")
-//       assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
+      const balanceAfter_user5 = await tokenInstance.balanceOf(accounts[5]);
+       assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred before")
+      assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred after")
+      assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_5[8],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
 
-//  })
+ })
 // // 151
  it("User 5 should be able to claim After 151 days Period", async()=>{
       const user5_amount = ether('2000');
@@ -189,12 +189,12 @@ it("Time should increase by 30 Days", async() =>{
       console.log(actualClaim_user5_before.toString())
       console.log(userVestingData_5[7].toString())
       
-      // assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred")
-      // assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred")
-      // assert.equal(actualClaim_user5_before.toString(),expectedClaims_user5.toString(),"Expected claims is not equal to actual")
-      // assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
-      // assert.equal(userVestingData_5[8],false,"isVesting Boolean is false before than expected")
-      // assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
+      assert.equal(balanceBefore_user5.toString(),currentBalance_user5.toString(),"No Toknes Transferred")
+      assert.equal(balanceAfter_user5.toString(),totalClaims_user5.toString(),"No Toknes Transferred")
+      assert.equal(actualClaim_user5_before.toString(),expectedClaims_user5.toString(),"Expected claims is not equal to actual")
+      assert.equal(userVestingData_5[7].toString(),totalClaims_user5.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_5[8],false,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_5[9],true,"tgeTokensClaimed Boolean is true");
 })
 
 

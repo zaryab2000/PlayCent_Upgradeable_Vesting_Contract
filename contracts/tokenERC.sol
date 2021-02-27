@@ -187,6 +187,8 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
             	uint256 previousTokens = vestingData.totalAmount.mul(60 ether).div(100 ether);
             	uint256 currentTokens  = vestingData.totalAmount.mul(25 ether).div(100 ether);
             	tokensToTransfer = currentTokens.add(previousTokens);
+            }else if(timeElapsedInDays > 180){
+            	tokensToTransfer = vestingData.totalAmount;
             }
 		}else if(category == 9){
             if(timeElapsedInDays > 90 && timeElapsedInDays <= 120 ){
@@ -201,11 +203,13 @@ contract PlayToken is Initializable,OwnableUpgradeable,ERC20PausableUpgradeable{
             	uint256 previousTokens = vestingData.totalAmount.mul(20 ether).div(100 ether);
             	uint256 currentTokens = vestingData.totalAmount.mul(60 ether).div(100 ether);
             	tokensToTransfer = currentTokens.add(previousTokens);
+            }else if(timeElapsedInDays > 180){
+            	tokensToTransfer = vestingData.totalAmount;
             }
 		}
 		tokensToTransfer = tokensToTransfer.sub(vestingData.totalAmountClaimed);
 		if(vestingData.tgeTokensClaimed){
-			tokensToTransfer = tokensToTransfer.sub(tgeTokens);
+			tokensToTransfer = tokensToTransfer.add(tgeTokens);
 		}
 		return tokensToTransfer;
 	}
