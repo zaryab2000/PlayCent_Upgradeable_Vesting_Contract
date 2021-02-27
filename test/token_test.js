@@ -42,21 +42,6 @@ contract("TokenSale Contract", accounts => {
     assert.equal(contractBalance.toString(),intialSupply.toString(),"Balance Not transferred");
   })
 
-  
-  
-  it("Send tokens via PlayToken", async() =>{
-    const beforeBalance = "0";
-    const transferToken = ether('100')
-    const balanceOfUser_before = await tokenInstance.balanceOf(accounts[1]);
-    await tokenInstance.sendTokens(accounts[1],transferToken);
-    const balanceOfUser = await tokenInstance.balanceOf(accounts[1]);
-    const balanceOfContract = await tokenInstance.balanceOf(tokenInstance.address);
-    console.log(`Contract Balance ${balanceOfContract}`)
-    assert.equal(balanceOfUser.toString(),transferToken.toString(),"Balance not transferred");
-    assert.equal(balanceOfUser_before.toString(),beforeBalance.toString(),"BalanceBefore not transferred");
-
-  })
-
 
   // Adding User details w.r.t vesting Categories by Owner
   it("Owner should be able to add User1,2 and 3 to the Vesting Schedule", async()=>{
@@ -68,27 +53,25 @@ contract("TokenSale Contract", accounts => {
 
     await tokenInstance.addVestingDetails(userArray,amountsArray,0);
 
-    const userVestingData_1 = await tokenInstance.userToVestingDetails(accounts[1])
-    const userVestingData_2 = await tokenInstance.userToVestingDetails(accounts[2])
-    const userVestingData_3 = await tokenInstance.userToVestingDetails(accounts[3])
+    const userVestingData_1 = await tokenInstance.userToVestingDetails(accounts[1],0)
+    const userVestingData_2 = await tokenInstance.userToVestingDetails(accounts[2],0)
+    const userVestingData_3 = await tokenInstance.userToVestingDetails(accounts[3],0)
   
     // User 1 checks
     assert.equal(userVestingData_1[0].toString(),"0","Vesting Category Is wrongly assigned");
     assert.equal(userVestingData_1[1],accounts[1],"Wallet Address Is wrongly assigned");
     assert.equal(userVestingData_1[2].toString(),user1_amount.toString(),"Total Amount is wrongly assigned");
     assert.equal(userVestingData_1[6].toString(),"5000000000000000000","Vesting Rate Is wrongly assigned");
-    assert.equal(userVestingData_1[7].toString(),user1_amount.toString(),"Total Remaining Amount Is wrongly assigned");
-    assert.equal(userVestingData_1[8].toString(),"0","Total Amount claimed Is wrongly assigned");
-    assert.equal(userVestingData_1[9],true,"IsVesting Is wrongly assigned");
+    assert.equal(userVestingData_1[7].toString(),"0","Total Amount claimed Is wrongly assigned");
+    assert.equal(userVestingData_1[8],true,"IsVesting Is wrongly assigned");
 
     // User 2 checks
     assert.equal(userVestingData_2[0].toString(),"0","Vesting Category Is wrongly assigned for User 2");
     assert.equal(userVestingData_2[1],accounts[2],"Wallet Address Is wrongly assigned for User 2");
     assert.equal(userVestingData_2[2].toString(),user2_amount.toString(),"Total Amount is wrongly assigned for User 2");
     assert.equal(userVestingData_2[6].toString(),"5000000000000000000","Vesting Rate Is wrongly assigned  for User 2");
-    assert.equal(userVestingData_2[7].toString(),user2_amount.toString(),"Remaining Amount Is wrongly assigned for User 2");
-    assert.equal(userVestingData_2[8].toString(),"0","Total Amount claimed wrongly assigned for User 2");
-    assert.equal(userVestingData_2[9],true,"IsVesting Is wrongly assigned for User 2");
+    assert.equal(userVestingData_2[7].toString(),"0","Total Amount claimed wrongly assigned for User 2");
+    assert.equal(userVestingData_2[8],true,"IsVesting Is wrongly assigned for User 2");
 
   })
 
@@ -101,27 +84,26 @@ contract("TokenSale Contract", accounts => {
     await tokenInstance.addVestingDetails([accounts[5]],[user5_amount],8);
     await tokenInstance.addVestingDetails([accounts[6]],[user6_amount],9);
 
-    const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4])
-    const userVestingData_5 = await tokenInstance.userToVestingDetails(accounts[5])
-    const userVestingData_6 = await tokenInstance.userToVestingDetails(accounts[6])
+    const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4],7)
+    const userVestingData_5 = await tokenInstance.userToVestingDetails(accounts[5],8)
+    const userVestingData_6 = await tokenInstance.userToVestingDetails(accounts[6],9)
   
     // User 1 checks
     assert.equal(userVestingData_4[0].toString(),"7","Vesting Category Is wrongly assigned");
     assert.equal(userVestingData_4[1],accounts[4],"Wallet Address Is wrongly assigned");
     assert.equal(userVestingData_4[2].toString(),user4_amount.toString(),"Total Amount is wrongly assigned");
     assert.equal(userVestingData_4[6].toString(),"10000000000000000000","Vesting Rate Is wrongly assigned");
-    assert.equal(userVestingData_4[7].toString(),user4_amount.toString(),"Total Remaining Amount Is wrongly assigned");
-    assert.equal(userVestingData_4[8].toString(),"0","Total Amount claimed Is wrongly assigned");
-    assert.equal(userVestingData_4[9],true,"IsVesting Is wrongly assigned");
+    assert.equal(userVestingData_4[7].toString(),"0","Total Amount claimed Is wrongly assigned");
+    assert.equal(userVestingData_4[8],true,"IsVesting Is wrongly assigned");
 
     // User 2 checks
     assert.equal(userVestingData_5[0].toString(),"8","Vesting Category Is wrongly assigned for User 2");
     assert.equal(userVestingData_5[1],accounts[5],"Wallet Address Is wrongly assigned for User 2");
     assert.equal(userVestingData_5[2].toString(),user5_amount.toString(),"Total Amount is wrongly assigned for User 2");
     assert.equal(userVestingData_5[6].toString(),"15000000000000000000","Vesting Rate Is wrongly assigned  for User 2");
-    assert.equal(userVestingData_5[7].toString(),user5_amount.toString(),"Remaining Amount Is wrongly assigned for User 2");
-    assert.equal(userVestingData_5[8].toString(),"0","Total Amount claimed wrongly assigned for User 2");
-    assert.equal(userVestingData_5[9],true,"IsVesting Is wrongly assigned for User 2");
+    //assert.equal(userVestingData_5[7].toString(),user5_amount.toString(),"Remaining Amount Is wrongly assigned for User 2");
+    assert.equal(userVestingData_5[7].toString(),"0","Total Amount claimed wrongly assigned for User 2");
+    assert.equal(userVestingData_5[8],true,"IsVesting Is wrongly assigned for User 2");
 
   })
 
@@ -146,9 +128,9 @@ contract("TokenSale Contract", accounts => {
   it("Normal Vesting Rates should be calculated as expected", async()=>{
       const expectedRate = ether('5');
       
-      const vestRate_1 = await tokenInstance.getVestingRate(accounts[1]);
-      const vestRate_2 = await tokenInstance.getVestingRate(accounts[2]);
-      const vestRate_3 = await tokenInstance.getVestingRate(accounts[3]);
+      const vestRate_1 = await tokenInstance.getVestingRate(accounts[1],0);
+      const vestRate_2 = await tokenInstance.getVestingRate(accounts[2],0);
+      const vestRate_3 = await tokenInstance.getVestingRate(accounts[3],0);
     
       assert.equal(vestRate_1.toString(),expectedRate.toString(),"Rates didn't match for User 1")
       assert.equal(vestRate_2.toString(),expectedRate.toString(),"Rates didn't match for User 2")
@@ -160,8 +142,8 @@ contract("TokenSale Contract", accounts => {
       const expectedClaimableTokens_user1 = 0;
       const expectedClaimableTokens_user6 = 0;
 
-      const actualClaimableReturn_user1 = await tokenInstance.calculateClaimableTokens(accounts[1]);
-      const actualClaimableReturn_user6 = await tokenInstance.calculateClaimableTokens(accounts[6]);
+      const actualClaimableReturn_user1 = await tokenInstance.calculateClaimableTokens(accounts[1],0);
+      const actualClaimableReturn_user6 = await tokenInstance.calculateClaimableTokens(accounts[6],9);
 
       assert.equal(actualClaimableReturn_user1.toString(),expectedClaimableTokens_user1.toString(),"Calcualted Rate is wrong for user 1");
       assert.equal(actualClaimableReturn_user6.toString(),expectedClaimableTokens_user6.toString(),"Calcualted Rate is wrong for user 6");
@@ -172,7 +154,7 @@ contract("TokenSale Contract", accounts => {
    it("Calculate Claimable Tokens function should work as expected before 60 days cliff ", async()=>{
       const expectedClaimableTokens_user4 = 0;
 
-      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
+      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4],7);
       
       assert.equal(actualClaimableReturn_user4.toString(),expectedClaimableTokens_user4.toString(),"Calcualted Rate is wrong for user 4");
 
@@ -207,180 +189,236 @@ contract("TokenSale Contract", accounts => {
   * If Complete Vesting Done, isVesting boolean should update to false
   * If TGE tokens claimed, tgeTokensClaimed boolean should update to false
   */
-  it("User 2 should not be able to claim before Claim Period", async()=>{
-      const user2_amount = ether('4000');
-      const balanceBefore_user2 = await tokenInstance.balanceOf(accounts[2]);
+  
+  it('User 4 should not be able to Claim Vest tokens before Cliff Period Time', async ()=>{
+      try{
+        await tokenInstance.claimVestTokens(accounts[4],7,{from:accounts[4]})
+      }catch(error){
+        const invalidOpcode = error.message.search("revert") >= 0;
+        console.log(error.message);
+        assert(invalidOpcode,`Expected revert but Got ${error}`)
+      }
+  })
+
+
+// 120 Days later => 2 months after CLIFF
+ it("Time should increase by 120 Days", async() =>{
+    await time.increase(time.duration.days(120));
+  })
+  // User 2 claiming before CLIFF Period
+   it("User 4 should be able to claim After Claim Period", async()=>{
+      const user4_amount = ether('2000');
+      const expectedClaims_user4 = ether('600');
+      const user4_remainingAmount = ether('1400')
+      const contractInitialBalance = ether('49400')
+      const contractRemainingBalance = ether('49200')
+      const balanceBefore_user4 = await tokenInstance.balanceOf(accounts[4]);
       const contractBalanceBefore = await tokenInstance.balanceOf(tokenInstance.address);
 
-      await tokenInstance.claimVestTokens(accounts[2],{from:accounts[2]});
-      const userVestingData_2 = await tokenInstance.userToVestingDetails(accounts[2])
+      // Claim Claiming Function
+      await tokenInstance.claimVestTokens(accounts[4],7,{from:accounts[4]});
+      const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4],7)
       
-      const balanceAfter_user2 = await tokenInstance.balanceOf(accounts[2]);
+      const balanceAfter_user4 = await tokenInstance.balanceOf(accounts[4]);
+      const actualClaim_user4 = await tokenInstance.calculateClaimableTokens(accounts[4],7);
       const contractBalanceAfter = await tokenInstance.balanceOf(tokenInstance.address);
-      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
       
-      assert.equal(balanceAfter_user2.toString(),"0","No Toknes Transferred")
-      assert.equal(contractBalanceBefore.toString(),contractBalanceAfter.toString(),"Contract Balance didn't update");
-      assert.equal(userVestingData_2[8].toString(),"0","Total Amount Claimed Didn't update");
-      assert.equal(userVestingData_2[7].toString(),user2_amount.toString(),"Remaining Amounts didn't update");
-      assert.equal(userVestingData_2[9],true,"isVesting Boolean is false before than expected")
+      assert.equal(balanceBefore_user4.toString(),"0","No Toknes Transferred")
+      assert.equal(balanceAfter_user4.toString(),expectedClaims_user4.toString(),"No Toknes Transferred")
+      assert.equal(userVestingData_4[7].toString(),expectedClaims_user4.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_4[8],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_4[9],false,"tgeTokensClaimed Boolean is true");
+})
+
+
+  it("User 2 should not be able to claim before Claim Period", async()=>{
+     try{
+        await tokenInstance.claimVestTokens(accounts[2],0,{from:accounts[2]})
+      }catch(error){
+        const invalidOpcode = error.message.search("revert") >= 0;
+        console.log(error.message);
+        assert(invalidOpcode,`Expected revert but Got ${error}`)
+      }
  })
 
-  // 30 Days after Cliff Period of User 2
-  it("Time should increase by 395 Days", async() =>{
-    await time.increase(time.duration.days(395));
+  // 275 Days after Cliff Period of User 2
+  it("Time should increase by 275 Days", async() =>{
+    await time.increase(time.duration.days(275));
   })
   // User 2 claiming before CLIFF Period
    it("User 2 should be able to claim After Claim Period", async()=>{
       const user2_amount = ether('4000');
       const expectedClaims_user2 = ether('200');
       const user2_remainingAmount = ether('3800')
-      const contractInitialBalance = ether('50000')
-      const contractRemainingBalance = ether('49800')
-
+      const contractInitialBalance = ether('49400')
+      const contractRemainingBalance = ether('49200')
       const balanceBefore_user2 = await tokenInstance.balanceOf(accounts[2]);
       const contractBalanceBefore = await tokenInstance.balanceOf(tokenInstance.address);
 
       // Claim Claiming Function
-    await tokenInstance.claimVestTokens(accounts[2],{from:accounts[2]});
-      const userVestingData_2 = await tokenInstance.userToVestingDetails(accounts[2])
+      await tokenInstance.claimVestTokens(accounts[2],0,{from:accounts[2]});
+      const userVestingData_2 = await tokenInstance.userToVestingDetails(accounts[2],0)
       
       const balanceAfter_user2 = await tokenInstance.balanceOf(accounts[2]);
       const contractBalanceAfter = await tokenInstance.balanceOf(tokenInstance.address);
-      const actualClaim_user2 = await tokenInstance.calculateClaimableTokens(accounts[2]);
+      const actualClaim_user2 = await tokenInstance.calculateClaimableTokens(accounts[2],0);
 
-      console.log(actualClaim_user2.toString())
-      console.log(contractBalanceBefore.toString())
+      
       assert.equal(balanceBefore_user2.toString(),"0","No Toknes Transferred")
       assert.equal(balanceAfter_user2.toString(),expectedClaims_user2.toString(),"No Toknes Transferred")
-      assert.equal(contractBalanceBefore.toString(),contractInitialBalance.toString(),"Contract Balance is less than expected");
-      assert.equal(contractRemainingBalance.toString(),contractRemainingBalance.toString(),"Contract Balance didn't update after token transfer");
-      assert.equal(userVestingData_2[8].toString(),expectedClaims_user2.toString(),"Total Amount Claimed Didn't update");
-      assert.equal(userVestingData_2[7].toString(),user2_remainingAmount.toString(),"Remaining Amounts didn't update");
-      assert.equal(userVestingData_2[9],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_2[7].toString(),expectedClaims_user2.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_2[8],true,"isVesting Boolean is false before than expected")
  })
 
 
- //  // Time 61 Days Later
- // it("Sale Vesting Rates should be calculated as expected Between 60 to 90 days", async()=>{
- //      const expectedRate4 = ether('15');
- //      const expectedRate5 = ether('20');
- //      const expectedRate6 = ether('20');
-     
- //      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
- //      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
- //      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
+   // 210 Days Later == 4 months after CLIFF Period for User 1
 
- //      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
- //      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
- //      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
-
- //  })
-
- //    it("Calculate Claimable Tokens function should work as expected before 60 days cliff ", async()=>{
- //      const expectedClaimableTokens_user4 = ether('300');
-
- //      const actualClaimableReturn_user4 = await tokenInstance.calculateClaimableTokens(accounts[4]);
- //      console.log(actualClaimableReturn_user4.toString())
- //     // assert.equal(actualClaimableReturn_user4.toString(),expectedClaimableTokens_user4.toString(),"Calcualted Rate is wrong for user 4");
-
- // })
-
- //   it("Time should increase by Days", async() =>{
- //    await time.increase(time.duration.days(32));
- //  })
- //   // Time 93 Days Later
- // it("Sale Vesting Rates should be calculated as expected Between 90 to 120 days", async()=>{
- //      const expectedRate4 = ether('15');
- //      const expectedRate5 = ether('20');
- //      const expectedRate6 = ether('30');
-     
- //      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
- //      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
- //      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
-
- //      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
- //      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
- //      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
-
- //  })
-
-
-
- //   it("Time should increase by Days", async() =>{
- //    await time.increase(time.duration.days(32));
- //  })
- //   // Time 125 Days Later
- // it("Sale Vesting Rates should be calculated as expected Between 120 to 150 days", async()=>{
- //      const expectedRate4 = ether('15');
- //      const expectedRate5 = ether('25');
- //      const expectedRate6 = 0;
-     
- //      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
- //      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
- //      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
-
- //      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
- //      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
- //      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
-
- //  })
-
-
- //   it("Time should increase by Days", async() =>{
- //    await time.increase(time.duration.days(32));
- //  })
- //   // Time 157Days Later
- // it("Sale Vesting Rates should be calculated as expected Between 150 to 213 days", async()=>{
- //      const expectedRate4 = ether('15');
- //      const expectedRate5 = 0;
- //      const expectedRate6 = 0;
-     
- //      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
- //      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
- //      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
-
- //      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
- //      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
- //      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
-
- //  })
-
- //  it("Time should increase by Days", async() =>{
- //    await time.increase(time.duration.days(100));
- //  })
- //    // Time 257 days Later
- // it("Sale Vesting Rates should be calculated as expected", async()=>{
- //      const expectedRate4 = 0;
- //      const expectedRate5 = 0;
- //      const expectedRate6 = 0;
-     
- //      const vestRate_4 = await tokenInstance.getVestingRate(accounts[4]);
- //      const vestRate_5 = await tokenInstance.getVestingRate(accounts[5]);
- //      const vestRate_6 = await tokenInstance.getVestingRate(accounts[6]);
-
- //      assert.equal(vestRate_4.toString(),expectedRate4.toString(),"Rates didn't match for User 4")
- //      assert.equal(vestRate_5.toString(),expectedRate5.toString(),"Rates didn't match for User 5")
- //      assert.equal(vestRate_6.toString(),expectedRate6.toString(),"Rates didn't match for User 6")
-
- //  })
-
- // it("Time should increase by Days", async() =>{
- //    await time.increase(time.duration.days(120));
- //  })
-    // Time 377 days later
-
- //  it("Calculate Claimable Tokens function should work as expected after cliff ", async()=>{
- //      const expectedClaimableTokens_user1 = ether('100');
-
- //      const actualClaimableReturn_user1 = await tokenInstance.calculateClaimableTokens(accounts[1]);
-
- //      assert.equal(actualClaimableReturn_user1.toString(),expectedClaimableTokens_user1.toString(),"Calcualted Rate is wrong for user 1");
-
- // })
-  // Check Claimable token for a particular user at any given time
-   it("Claimable token should be calculated correctly at any given time", async()=>{
-    
+     it("Time should increase by 210 Days", async() =>{
+    await time.increase(time.duration.days(210));
   })
+  it("User 1 should be able to claim After Claim Period 4 months", async()=>{
+      const user1_amount = ether('2000');
+      const expectedClaims_user1 = ether('800');
+
+      const balanceBefore_user1 = await tokenInstance.balanceOf(accounts[1]);
+      const actualClaim_user1 = await tokenInstance.calculateClaimableTokens(accounts[1],0);
+
+      // Claim Claiming Function
+      await tokenInstance.claimVestTokens(accounts[1],0,{from:accounts[1]});
+      const userVestingData_1 = await tokenInstance.userToVestingDetails(accounts[1],0)
+      
+      const balanceAfter_user1 = await tokenInstance.balanceOf(accounts[1]);
+
+      
+      assert.equal(balanceBefore_user1.toString(),"0","No Toknes Transferred")
+      assert.equal(balanceAfter_user1.toString(),expectedClaims_user1.toString(),"No Toknes Transferred")
+      assert.equal(actualClaim_user1.toString(), expectedClaims_user1.toString(),"Claim Rate doesn't match")
+      assert.equal(userVestingData_1[7].toString(),expectedClaims_user1.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_1[8],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_1[9],false,"tgeTokensClaimed Boolean is false")
+
+ })
+
+  it("Time should increase by 45 Days", async() =>{
+    await time.increase(time.duration.days(45));
+  })
+  it("User 1 should be able to claim After Claim Period 5 months", async()=>{
+      const user1_amount = ether('2000');
+      const currentBalanceUser1 = ether('800');
+      const expectedClaims_user1 = ether('100');
+      const totalClaims_user1 = ether('900');
+
+      const balanceBefore_user1 = await tokenInstance.balanceOf(accounts[1]);
+      const actualClaim_user1 = await tokenInstance.calculateClaimableTokens(accounts[1],0);
+
+      // Claim Claiming Function
+      await tokenInstance.claimVestTokens(accounts[1],0,{from:accounts[1]});
+      const userVestingData_1 = await tokenInstance.userToVestingDetails(accounts[1],0)
+      
+      const balanceAfter_user1 = await tokenInstance.balanceOf(accounts[1]);
+
+      
+      assert.equal(balanceBefore_user1.toString(),currentBalanceUser1.toString(),"No Toknes Transferred")
+      assert.equal(balanceAfter_user1.toString(),totalClaims_user1.toString(),"No Toknes Transferred after")
+      assert.equal(actualClaim_user1.toString(), expectedClaims_user1.toString(),"Claim Rate doesn't match")
+      assert.equal(userVestingData_1[7].toString(),totalClaims_user1.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_1[8],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_1[9],false,"tgeTokensClaimed Boolean is false")
+
+ })
+
+// User 4 Trying to Claim After Complete Vesting Duration is Over
+
+  it('User 4 should be able to Claim TGE tokens after TGE Time', async ()=>{
+       const user4_amount = ether('2000');
+       const user4_current_balance = ether('600');
+      const expectedClaims_user4 = ether('800');
+      const user4_remainingAmount = ether('1200')
+
+      const balanceBefore_user4 = await tokenInstance.balanceOf(accounts[4]);
+
+      // Claim Claiming Function
+     await tokenInstance.claimTGETokens(accounts[4],7,{from:accounts[4]});
+    const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4],7)
+
+  
+     const balanceAfter_user4 = await tokenInstance.balanceOf(accounts[4]);
+      assert.equal(balanceBefore_user4.toString(),user4_current_balance.toString(),"No Toknes Transferred")
+      assert.equal(balanceAfter_user4.toString(),expectedClaims_user4.toString(),"No Toknes Transferred")
+      assert.equal(userVestingData_4[7].toString(),expectedClaims_user4.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_4[8],true,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_4[9],true,"tgeTokensClaimed Boolean is false")
+
+ })
+
+ it("User 4 should be able to claim After Complete Vesting Period Is Over", async()=>{
+      const user4_amount = ether('2000');
+      const user4_current_balance = ether('800');
+      const expectedClaims_user4 = ether('1200');
+      const user4_remainingAmount = "0";
+
+      const balanceBefore_user4 = await tokenInstance.balanceOf(accounts[4]);
+
+      // Claim Claiming Function
+      await tokenInstance.claimVestTokens(accounts[4],7,{from:accounts[4]});
+      const userVestingData_4 = await tokenInstance.userToVestingDetails(accounts[4],7)
+      
+      const balanceAfter_user4 = await tokenInstance.balanceOf(accounts[4]);
+    
+      assert.equal(balanceBefore_user4.toString(),user4_current_balance.toString(),"No Toknes Transferred")
+      assert.equal(balanceAfter_user4.toString(),user4_amount.toString(),"No Toknes Transferred")
+    
+      assert.equal(userVestingData_4[7].toString(),user4_amount.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_4[8],false,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_4[9],true,"tgeTokensClaimed Boolean is true");
+})
+
+  it("User 4 should not be able to claim For VEST Tokens TWICE", async()=>{
+     try{
+          await tokenInstance.claimVestTokens(accounts[4],7,{from:accounts[4]});
+      }catch(error){
+        const invalidOpcode = error.message.search("revert") >= 0;
+        console.log(error.message);
+        assert(invalidOpcode,`Expected revert but Got ${error}`)
+      }
+ })
+  // 578 Days Later => After A TOTAL OF 974 days( AFTER VESTING DURATION FOR CATEGORY ZERO is over)
+ it("Time should increase by 578 Days", async() =>{
+    await time.increase(time.duration.days(578));
+  })
+  // User 3 Trying to Claim After Complete Vesting Period
+ it("User 3 should be able to claim After Claim Period", async()=>{
+      const user3_amount = ether('6000');
+      const expectedClaims_user3 = ether('6000');
+
+      const balanceBefore_user3 = await tokenInstance.balanceOf(accounts[3]);
+      const actualClaim_user3 = await tokenInstance.calculateClaimableTokens(accounts[3],0);
+
+      // Claim Claiming Function
+      await tokenInstance.claimVestTokens(accounts[3],0,{from:accounts[3]});
+      const userVestingData_3 = await tokenInstance.userToVestingDetails(accounts[3],0)
+      
+      const balanceAfter_user3 = await tokenInstance.balanceOf(accounts[3]);
+
+      
+      assert.equal(balanceBefore_user3.toString(),"0","No Toknes Transferred")
+      assert.equal(balanceAfter_user3.toString(),expectedClaims_user3.toString(),"No Toknes Transferred")
+      assert.equal(userVestingData_3[7].toString(),expectedClaims_user3.toString(),"Total Amount Claimed Didn't update");
+      assert.equal(userVestingData_3[8],false,"isVesting Boolean is false before than expected")
+      assert.equal(userVestingData_3[9],false,"tgeTokensClaimed Boolean is false")
+
+ })
+
+
+  it("User 3 should not be able to claim For VEST Tokens TWICE", async()=>{
+     try{
+          await tokenInstance.claimVestTokens(accounts[3],0,{from:accounts[3]});
+      }catch(error){
+        const invalidOpcode = error.message.search("revert") >= 0;
+        console.log(error.message);
+        assert(invalidOpcode,`Expected revert but Got ${error}`)
+      }
+ })
+
 
 });
