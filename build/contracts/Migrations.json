@@ -930,15 +930,15 @@
     "version": "0.6.2+commit.bacdbe57.Linux.g++"
   },
   "networks": {
-    "1614421766621": {
+    "1614433373784": {
       "events": {},
       "links": {},
-      "address": "0x24450F8fCC12c45e61A502689A302fa590a2b99E",
-      "transactionHash": "0x94f3fafc3a1b3365310b9fbd09d08dd3817af10ccf9477fb1936fd7a79ab0b4c"
+      "address": "0xc89b080762B1C12826d12e8da7631Aa27f15E00c",
+      "transactionHash": "0x7c1a270e40dc64baa875fbbd87f145f8eadf193204ee88d4a344df72ea17b496"
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-02-27T13:20:43.494Z",
+  "updatedAt": "2021-02-27T14:46:50.783Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
